@@ -24,6 +24,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{373A3854
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{5A465550-E5E6-457E-A982-838CEB0F8827}"
+	ProjectSection(SolutionItems) = preProject
+		tools\SimpleSoft.DependencyInjection.PublicKey = tools\SimpleSoft.DependencyInjection.PublicKey
+		tools\SimpleSoft.DependencyInjection.snk = tools\SimpleSoft.DependencyInjection.snk
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +48,6 @@ Global
 		{9A7AD5EC-64B1-460D-9355-A7D4865BF869} = {9D04B94A-38EF-4C44-96B6-DC70A49551C0}
 		{C1AAF3F0-DCB1-4524-841F-DA8D6B98275E} = {68305EAD-DEB4-4A93-AB14-95191E71C2F0}
 		{373A3854-397A-4BDB-9485-9765717625A2} = {68305EAD-DEB4-4A93-AB14-95191E71C2F0}
+		{5A465550-E5E6-457E-A982-838CEB0F8827} = {68305EAD-DEB4-4A93-AB14-95191E71C2F0}
 	EndGlobalSection
 EndGlobal
