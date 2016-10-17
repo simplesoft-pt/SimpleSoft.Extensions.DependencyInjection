@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 
 #endif
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 
 [assembly: AssemblyVersion("1.0.0")]
 [assembly: AssemblyInformationalVersion("1.0.0-alpha01")]
