@@ -26,7 +26,7 @@ namespace SimpleSoft.DependencyInjection
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Classes implemented this interface will be loaded
+    /// Classes implementing this interface will be loaded
     /// and used to configure the <see cref="IServiceCollection"/>.
     /// </summary>
     public interface IServiceConfigurator
