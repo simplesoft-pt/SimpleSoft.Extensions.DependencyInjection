@@ -38,6 +38,7 @@ namespace SimpleSoft.DependencyInjection
         private static readonly Type ServiceConfiguratorType = typeof(IServiceConfigurator);
 #else
         private static readonly TypeInfo ServiceConfiguratorType = typeof(IServiceConfigurator).GetTypeInfo();
+        private static readonly TypeInfo ServiceAttributeType = typeof(ServiceAttribute).GetTypeInfo();
 #endif
 
         /// <summary>
@@ -57,13 +58,14 @@ namespace SimpleSoft.DependencyInjection
             foreach (var exportedType in assembly.GetExportedTypes().Where(e => e.IsClass && !e.IsAbstract))
             {
                 IServiceConfigurator serviceConfigurator;
+                ServiceAttribute serviceAttribute;
                 if (exportedType.TryCastAsServiceConfigurator(out serviceConfigurator))
                 {
                     serviceConfigurator.Configure(services);
                 }
-                else
+                else if(exportedType.TryGetServiceAttribute(out serviceAttribute))
                 {
-                    
+
                 }
             }
 
@@ -147,6 +149,14 @@ namespace SimpleSoft.DependencyInjection
             return false;
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static bool TryGetServiceAttribute(this Type type, out ServiceAttribute serviceAttribute)
+        {
+            serviceAttribute = type.GetCustomAttribute<ServiceAttribute>(true);
+            return serviceAttribute != null;
+        }
+
 #else
 
         [System.Runtime.CompilerServices.MethodImpl(
@@ -175,6 +185,18 @@ namespace SimpleSoft.DependencyInjection
 
             serviceConfigurator = null;
             return false;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static bool TryGetServiceAttribute(this TypeInfo type, out ServiceAttribute serviceAttribute)
+        {
+            var attrData =
+                type.CustomAttributes.SingleOrDefault(
+                    e => ServiceAttributeType.IsAssignableFrom(e.AttributeType.GetTypeInfo()));
+
+            serviceAttribute = null;
+            return serviceAttribute != null;
         }
 
 #endif
