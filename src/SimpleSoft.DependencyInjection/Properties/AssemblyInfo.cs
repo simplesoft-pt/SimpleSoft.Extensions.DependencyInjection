@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Library with utility classes for Microsoft Dependency Injection.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Net.JoaoSimoes")]
-[assembly: AssemblyProduct("SimpleExceptionHandling")]
+[assembly: AssemblyProduct("SimpleSoft.DependencyInjection")]
 [assembly: AssemblyCopyright("Copyright © 2016 João Simões")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
