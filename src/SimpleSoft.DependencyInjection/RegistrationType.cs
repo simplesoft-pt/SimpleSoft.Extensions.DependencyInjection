@@ -21,6 +21,16 @@
         /// <summary>
         /// The service will only be registered as itself
         /// </summary>
-        Self = 1 << 2
+        Self = 1 << 2,
+
+        /// <summary>
+        /// Both implemented interfaces and derived classes will be used
+        /// </summary>
+        InterfacesAndDerived = Interfaces | Derived,
+
+        /// <summary>
+        /// Interfaces, derived and self will be used
+        /// </summary>
+        All = Interfaces | Derived | Self
     }
 }

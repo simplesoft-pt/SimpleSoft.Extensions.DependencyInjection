@@ -45,6 +45,8 @@ namespace SimpleSoft.DependencyInjection
 
         /// <summary>
         /// The registration type. Defaults to <see cref="RegistrationType.Interfaces"/>.
+        /// Note that if no match found for the registration type (example: interface only registration
+        /// but no implemented interfaces found) the class will be registered by <see cref="RegistrationType.Self"/>.
         /// </summary>
         public RegistrationType Registration { get; set; } = RegistrationType.Interfaces;
 
