@@ -2,7 +2,7 @@
 {
     using Microsoft.Extensions.DependencyInjection;
 
-    public class MockServiceConfigurator : IServiceConfigurator
+    public class MockServiceConfigurator02 : IServiceConfigurator
     {
         public void Configure(IServiceCollection services)
         {
