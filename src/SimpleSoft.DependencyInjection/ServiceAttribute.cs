@@ -44,9 +44,9 @@ namespace SimpleSoft.DependencyInjection
         public bool TryAdd { get; set; }
 
         /// <summary>
-        /// The registration type. Defaults to <see cref="RegistrationType.InterfacesOnly"/>.
+        /// The registration type. Defaults to <see cref="RegistrationType.Interfaces"/>.
         /// </summary>
-        public RegistrationType Registration { get; set; } = RegistrationType.InterfacesOnly;
+        public RegistrationType Registration { get; set; } = RegistrationType.Interfaces;
 
         /// <summary>
         /// Types to register this service. If none specified, the property
