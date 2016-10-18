@@ -28,6 +28,7 @@ namespace SimpleSoft.DependencyInjection
     using System.Linq;
     using System.Reflection;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
 
     /// <summary>
     /// Extension methods used to scan assemblies
@@ -65,7 +66,31 @@ namespace SimpleSoft.DependencyInjection
                 }
                 else if(exportedType.TryGetServiceAttribute(out serviceAttribute))
                 {
+                    IEnumerable<Type> typesToRegister;
+                    if (serviceAttribute.TypesToRegister == null || serviceAttribute.TypesToRegister.Length == 0)
+                    {
+                        typesToRegister = 
+                            exportedType.GetServicesToRegisterBasedOnRegistration(serviceAttribute.Registration);
+                    }
+                    else
+                    {
+                        typesToRegister = serviceAttribute.TypesToRegister;
+                    }
 
+                    if (serviceAttribute.TryAdd)
+                    {
+                        foreach (var type in typesToRegister)
+                        {
+                            services.TryAdd(type, exportedType, serviceAttribute.ServiceLifetime);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var type in typesToRegister)
+                        {
+                            services.Add(type, exportedType, serviceAttribute.ServiceLifetime);
+                        }
+                    }
                 }
             }
 
@@ -157,6 +182,43 @@ namespace SimpleSoft.DependencyInjection
             return serviceAttribute != null;
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static IEnumerable<Type> GetServicesToRegisterBasedOnRegistration(
+            this Type implementationType, RegistrationType registration)
+        {
+            var result = new List<Type>();
+
+            if ((registration & RegistrationType.Interfaces) == RegistrationType.Interfaces)
+            {
+                result.AddRange(implementationType.GetInterfaces());
+            }
+
+            if (result.Count == 0 ||
+                ((registration & RegistrationType.Self) == RegistrationType.Self))
+            {
+                result.Add(implementationType);
+            }
+
+            return result;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static void TryAdd(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
+        {
+            services.TryAdd(
+                new ServiceDescriptor(serviceType, implementationType, lifetime));
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static void Add(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
+        {
+            services.Add(
+                new ServiceDescriptor(serviceType, implementationType, lifetime));
+        }
+
 #else
 
         [System.Runtime.CompilerServices.MethodImpl(
@@ -191,12 +253,82 @@ namespace SimpleSoft.DependencyInjection
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static bool TryGetServiceAttribute(this TypeInfo type, out ServiceAttribute serviceAttribute)
         {
-            var attrData =
+            var customAttributeData =
                 type.CustomAttributes.SingleOrDefault(
                     e => ServiceAttributeType.IsAssignableFrom(e.AttributeType.GetTypeInfo()));
+            if (customAttributeData == null)
+            {
+                serviceAttribute = null;
+                return false;
+            }
 
-            serviceAttribute = null;
-            return serviceAttribute != null;
+            serviceAttribute = (ServiceAttribute)
+                ServiceAttributeType.DeclaredConstructors.Single().Invoke(
+                    new[] {customAttributeData.ConstructorArguments[0].Value});
+            foreach (var namedArgument in customAttributeData.NamedArguments)
+            {
+                switch (namedArgument.MemberName)
+                {
+                    case nameof(ServiceAttribute.Registration):
+                    {
+                        serviceAttribute.Registration = (RegistrationType) namedArgument.TypedValue.Value;
+                        break;
+                    }
+                    case nameof(ServiceAttribute.TryAdd):
+                    {
+                        serviceAttribute.TryAdd = (bool) namedArgument.TypedValue.Value;
+                        break;
+                    }
+                    case nameof(ServiceAttribute.TypesToRegister):
+                    {
+                        serviceAttribute.TypesToRegister = ((IEnumerable<CustomAttributeTypedArgument>)
+                            namedArgument.TypedValue.Value).Select(e => (Type) e.Value).ToArray();
+                        break;
+                    }
+                    default:
+                        throw new InvalidOperationException(
+                            $"The member '{namedArgument.MemberName}' has no assign code");
+                }
+            }
+
+            return true;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static IEnumerable<Type> GetServicesToRegisterBasedOnRegistration(
+            this TypeInfo implementationType, RegistrationType registration)
+        {
+            var result = new List<Type>();
+
+            if ((registration & RegistrationType.Interfaces) == RegistrationType.Interfaces)
+            {
+                result.AddRange(implementationType.ImplementedInterfaces);
+            }
+
+            if (result.Count == 0 ||
+                ((registration & RegistrationType.Self) == RegistrationType.Self))
+            {
+                result.Add(implementationType.AsType());
+            }
+
+            return result;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static void TryAdd(this IServiceCollection services, Type serviceType, TypeInfo implementationType, ServiceLifetime lifetime)
+        {
+            services.TryAdd(
+                new ServiceDescriptor(serviceType, implementationType.AsType(), lifetime));
+        }
+        
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static void Add(this IServiceCollection services, Type serviceType, TypeInfo implementationType, ServiceLifetime lifetime)
+        {
+            services.Add(
+                new ServiceDescriptor(serviceType, implementationType.AsType(), lifetime));
         }
 
 #endif

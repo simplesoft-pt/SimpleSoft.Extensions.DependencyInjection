@@ -14,23 +14,13 @@
         Interfaces = 1 << 0,
 
         /// <summary>
-        /// Only derived classes will be used
-        /// </summary>
-        Derived = 1 << 1,
-
-        /// <summary>
         /// The service will only be registered as itself
         /// </summary>
-        Self = 1 << 2,
-
-        /// <summary>
-        /// Both implemented interfaces and derived classes will be used
-        /// </summary>
-        InterfacesAndDerived = Interfaces | Derived,
+        Self = 1 << 1,
 
         /// <summary>
         /// Interfaces, derived and self will be used
         /// </summary>
-        All = Interfaces | Derived | Self
+        All = Interfaces | Self
     }
 }
