@@ -31,7 +31,7 @@ namespace SimpleSoft.DependencyInjection
     /// into the container
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class ServiceAttribute : Attribute
+    public sealed class ServiceAttribute : Attribute
     {
         /// <summary>
         /// The service lifetime
