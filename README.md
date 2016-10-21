@@ -57,7 +57,10 @@ This library is compatible with the folowing frameworks:
             _settings = settings;
         }
 
-        public override string ToString() => $"{{ Id : '{_settings.Id:D}' }}";
+		public override string ToString()
+        {
+            return $"{{ Id : '{_settings.Id:D}' }}";
+        }
     }
 
     public class ProviderSettings
