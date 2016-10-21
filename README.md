@@ -23,77 +23,80 @@ This library is compatible with the folowing frameworks:
 
 ## Tipical usage
 ```csharp
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using SimpleSoft.DependencyInjection;
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+    using SimpleSoft.DependencyInjection;
 
-public class Program
-{
-	public static void Main(string[] args)
-	{
-		var provider =
-			new ServiceCollection()
-				.AddServicesFrom<Program>()
-				.BuildServiceProvider();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var provider =
+                new ServiceCollection()
+                    .AddServicesFrom<Program>()
+                    .BuildServiceProvider();
 
-		foreach (var service in provider.GetServices<IProvider>())
-		{
-			Console.WriteLine(service);
-		}
-	}
-}
+            foreach (var service in provider.GetServices<IProvider>())
+            {
+                Console.WriteLine(service);
+            }
 
-public interface IProvider { }
+            Console.WriteLine(provider.GetRequiredService<IFacebookProvider>());
+            Console.WriteLine(provider.GetRequiredService<IGoogleProvider>());
+        }
+    }
 
-public abstract class Provider : IProvider
-{
-	private readonly ProviderSettings _settings;
+    public interface IProvider { }
 
-	protected Provider(ProviderSettings settings)
-	{
-		_settings = settings;
-	}
+    public abstract class Provider : IProvider
+    {
+        private readonly ProviderSettings _settings;
 
-	public override string ToString() => string.Concat("{ Id : '", _settings.Id.ToString("D"), "' }");
-}
+        protected Provider(ProviderSettings settings)
+        {
+            _settings = settings;
+        }
 
-public class ProviderSettings
-{
-	public Guid Id { get; set; } = Guid.NewGuid();
-}
+        public override string ToString() => $"{{ Id : '{_settings.Id:D}' }}";
+    }
 
-public interface IFacebookProvider : IProvider { }
+    public class ProviderSettings
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+    }
 
-public interface IGoogleProvider : IProvider { }
+    public interface IFacebookProvider : IProvider { }
 
-[Service(ServiceLifetime.Transient)]
-public class GoogleProvider : Provider, IGoogleProvider
-{
-	public GoogleProvider(ProviderSettings settings) : base(settings)
-	{
+    public interface IGoogleProvider : IProvider { }
 
-	}
-}
+    [Service(ServiceLifetime.Transient)]
+    public class GoogleProvider : Provider, IGoogleProvider
+    {
+        public GoogleProvider(ProviderSettings settings) : base(settings)
+        {
 
-[Service(TypesToRegister = new[] {typeof(IFacebookProvider)})]
-public class FacebookProvider : Provider, IFacebookProvider
-{
-	public FacebookProvider(ProviderSettings settings) : base(settings)
-	{
+        }
+    }
 
-	}
-}
+    [Service(TypesToRegister = new[] {typeof(FacebookProvider), typeof(IFacebookProvider)})]
+    public class FacebookProvider : Provider, IFacebookProvider
+    {
+        public FacebookProvider(ProviderSettings settings) : base(settings)
+        {
 
-public class ServiceConfigurator : IServiceConfigurator
-{
-	public void Configure(IServiceCollection services)
-	{
-		services.AddTransient(k => new ProviderSettings
-		{
-			Id = Guid.NewGuid()
-		});
-	}
-}
+        }
+    }
+
+    public class ServiceConfigurator : IServiceConfigurator
+    {
+        public void Configure(IServiceCollection services)
+        {
+            services.AddTransient(k => new ProviderSettings
+            {
+                Id = Guid.NewGuid()
+            });
+        }
+    }
 ```
 
 
