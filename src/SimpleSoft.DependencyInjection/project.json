@@ -28,11 +28,66 @@
   },
 
   "frameworks": {
-    "net4.5": {
+    ".NETPortable,Version=v4.5,Profile=Profile111": {
+      "buildOptions": {
+        "define": [ "PORTABLE45" ]
+      },
       "frameworkAssemblies": {
-        "System.Runtime": { "type": "build" } 
+        "mscorlib": "",
+        "System": { "type": "build" },
+        "System.Core": { "type": "build" },
+        "System.Runtime": { "type": "build" },
+        "System.Collections": { "type": "build" }
       }
     },
-    "netstandard1.0": {}
+    "monoandroid1.0": {
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": { "type": "build" },
+        "System.Core": { "type": "build" },
+        "System.Runtime": { "type": "build" },
+        "System.Collections": { "type": "build" }
+      }
+    },
+    "monotouch1.0": {
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": { "type": "build" },
+        "System.Core": { "type": "build" },
+        "System.Runtime": { "type": "build" }
+      }
+    },
+    "net4.5": {
+      "frameworkAssemblies": {
+        "System.Runtime": { "type": "build" }
+      }
+    },
+    "netcore5.0": {},
+    "netstandard1.0": {},
+    "wpa8.1": {
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": { "type": "build" },
+        "System.Core": { "type": "build" },
+        "System.Runtime": { "type": "build" },
+        "System.Collections": { "type": "build" }
+      }
+    },
+    "xamarinios1.0": {
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": { "type": "build" },
+        "System.Core": { "type": "build" },
+        "System.Runtime": { "type": "build" }
+      }
+    },
+    "xamarintvos1.0": {
+      "frameworkAssemblies": {
+        "mscorlib": "",
+        "System": { "type": "build" },
+        "System.Core": { "type": "build" },
+        "System.Runtime": { "type": "build" }
+      }
+    }
   }
 }

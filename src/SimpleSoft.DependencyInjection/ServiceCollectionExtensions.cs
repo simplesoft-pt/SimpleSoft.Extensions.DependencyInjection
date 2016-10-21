@@ -56,21 +56,21 @@ namespace SimpleSoft.DependencyInjection
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
-            foreach (var exportedType in assembly.GetExportedTypes().Where(e => e.IsClass && !e.IsAbstract))
+            foreach (var exportedType in GetExportedTypes(assembly).Where(e => e.IsClass && !e.IsAbstract))
             {
                 IServiceConfigurator serviceConfigurator;
                 ServiceAttribute serviceAttribute;
-                if (exportedType.TryCastAsServiceConfigurator(out serviceConfigurator))
+                if (TryCastAsServiceConfigurator(exportedType, out serviceConfigurator))
                 {
                     serviceConfigurator.Configure(services);
                 }
-                else if(exportedType.TryGetServiceAttribute(out serviceAttribute))
+                else if(TryGetServiceAttribute(exportedType, out serviceAttribute))
                 {
                     IEnumerable<Type> typesToRegister;
                     if (serviceAttribute.TypesToRegister == null || serviceAttribute.TypesToRegister.Length == 0)
                     {
                         typesToRegister = 
-                            exportedType.GetServicesToRegisterBasedOnRegistration(serviceAttribute.Registration);
+                            GetServicesToRegisterBasedOnRegistration(exportedType, serviceAttribute.Registration);
                     }
                     else
                     {
@@ -81,14 +81,14 @@ namespace SimpleSoft.DependencyInjection
                     {
                         foreach (var type in typesToRegister)
                         {
-                            services.TryAdd(type, exportedType, serviceAttribute.ServiceLifetime);
+                            TryAdd(services, type, exportedType, serviceAttribute.ServiceLifetime);
                         }
                     }
                     else
                     {
                         foreach (var type in typesToRegister)
                         {
-                            services.Add(type, exportedType, serviceAttribute.ServiceLifetime);
+                            Add(services, type, exportedType, serviceAttribute.ServiceLifetime);
                         }
                     }
                 }
@@ -110,7 +110,7 @@ namespace SimpleSoft.DependencyInjection
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            return services.AddServicesFrom(typeof(T).GetAssembly());
+            return services.AddServicesFrom(GetAssembly(typeof(T)));
         }
 
         /// <summary>
@@ -216,13 +216,20 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static Assembly GetAssembly(this Type type) {
+        private static Assembly GetAssembly(Type type) {
             return type.Assembly;
         }
-        
+
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool TryCastAsServiceConfigurator(this Type type, out IServiceConfigurator serviceConfigurator)
+        private static IEnumerable<Type> GetExportedTypes(Assembly assembly)
+        {
+            return assembly.GetExportedTypes();
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static bool TryCastAsServiceConfigurator(Type type, out IServiceConfigurator serviceConfigurator)
         {
             if (ServiceConfiguratorType.IsAssignableFrom(type))
             {
@@ -236,7 +243,7 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool TryGetServiceAttribute(this Type type, out ServiceAttribute serviceAttribute)
+        private static bool TryGetServiceAttribute(Type type, out ServiceAttribute serviceAttribute)
         {
             serviceAttribute = type.GetCustomAttribute<ServiceAttribute>(true);
             return serviceAttribute != null;
@@ -245,7 +252,7 @@ namespace SimpleSoft.DependencyInjection
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<Type> GetServicesToRegisterBasedOnRegistration(
-            this Type implementationType, RegistrationType registration)
+            Type implementationType, RegistrationType registration)
         {
             var result = new List<Type>();
 
@@ -265,7 +272,7 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static void TryAdd(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
+        private static void TryAdd(IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
         {
             services.TryAdd(
                 new ServiceDescriptor(serviceType, implementationType, lifetime));
@@ -273,7 +280,7 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static void Add(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
+        private static void Add(IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
         {
             services.Add(
                 new ServiceDescriptor(serviceType, implementationType, lifetime));
@@ -283,21 +290,21 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static Assembly GetAssembly(this Type type)
+        private static Assembly GetAssembly(Type type)
         {
             return type.GetTypeInfo().Assembly;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static IEnumerable<TypeInfo> GetExportedTypes(this Assembly assembly)
+        private static IEnumerable<TypeInfo> GetExportedTypes(Assembly assembly)
         {
             return assembly.ExportedTypes.Select(e => e.GetTypeInfo());
         }
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool TryCastAsServiceConfigurator(this TypeInfo type, out IServiceConfigurator serviceConfigurator)
+        private static bool TryCastAsServiceConfigurator(TypeInfo type, out IServiceConfigurator serviceConfigurator)
         {
             if (ServiceConfiguratorType.IsAssignableFrom(type))
             {
@@ -311,7 +318,7 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool TryGetServiceAttribute(this TypeInfo type, out ServiceAttribute serviceAttribute)
+        private static bool TryGetServiceAttribute(TypeInfo type, out ServiceAttribute serviceAttribute)
         {
             var customAttributeData =
                 type.CustomAttributes.SingleOrDefault(
@@ -357,7 +364,7 @@ namespace SimpleSoft.DependencyInjection
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<Type> GetServicesToRegisterBasedOnRegistration(
-            this TypeInfo implementationType, RegistrationType registration)
+            TypeInfo implementationType, RegistrationType registration)
         {
             var result = new List<Type>();
 
@@ -377,7 +384,7 @@ namespace SimpleSoft.DependencyInjection
 
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static void TryAdd(this IServiceCollection services, Type serviceType, TypeInfo implementationType, ServiceLifetime lifetime)
+        private static void TryAdd(IServiceCollection services, Type serviceType, TypeInfo implementationType, ServiceLifetime lifetime)
         {
             services.TryAdd(
                 new ServiceDescriptor(serviceType, implementationType.AsType(), lifetime));
@@ -385,7 +392,7 @@ namespace SimpleSoft.DependencyInjection
         
         [System.Runtime.CompilerServices.MethodImpl(
             System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static void Add(this IServiceCollection services, Type serviceType, TypeInfo implementationType, ServiceLifetime lifetime)
+        private static void Add(IServiceCollection services, Type serviceType, TypeInfo implementationType, ServiceLifetime lifetime)
         {
             services.Add(
                 new ServiceDescriptor(serviceType, implementationType.AsType(), lifetime));
