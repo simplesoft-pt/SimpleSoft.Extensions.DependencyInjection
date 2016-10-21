@@ -127,7 +127,9 @@ namespace SimpleSoft.DependencyInjection
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (assemblies == null) throw new ArgumentNullException(nameof(assemblies));
 
-            return services.AddServicesFrom((IEnumerable<Assembly>) assemblies);
+            return assemblies.Length == 0
+                ? services
+                : services.AddServicesFrom((IEnumerable<Assembly>) assemblies);
         }
 
         /// <summary>
@@ -151,6 +153,64 @@ namespace SimpleSoft.DependencyInjection
 
             return services;
         }
+
+        /// <summary>
+        /// Configures the service collection using the given <see cref="IServiceConfigurator"/>.
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="configurator">The service configurator</param>
+        /// <returns>The service collection after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IServiceCollection ConfigureUsing(this IServiceCollection services, IServiceConfigurator configurator)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (configurator == null) throw new ArgumentNullException(nameof(configurator));
+
+            configurator.Configure(services);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Configures the service collection using the given <see cref="IServiceConfigurator"/> collection.
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="configurators">The service configurators</param>
+        /// <returns>The service collection after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IServiceCollection ConfigureUsing(
+            this IServiceCollection services, params IServiceConfigurator[] configurators)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (configurators == null) throw new ArgumentNullException(nameof(configurators));
+
+            return configurators.Length == 0
+                ? services
+                : services.ConfigureUsing((IEnumerable<IServiceConfigurator>) configurators);
+        }
+
+        /// <summary>
+        /// Configures the service collection using the given <see cref="IServiceConfigurator"/> collection.
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="configurators">The service configurators</param>
+        /// <returns>The service collection after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IServiceCollection ConfigureUsing(
+            this IServiceCollection services, IEnumerable<IServiceConfigurator> configurators)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (configurators == null) throw new ArgumentNullException(nameof(configurators));
+
+            foreach (var configurator in configurators)
+            {
+                services.ConfigureUsing(configurator);
+            }
+
+            return services;
+        }
+
+        #region Private Helpers
 
 #if NET45
 
@@ -332,5 +392,7 @@ namespace SimpleSoft.DependencyInjection
         }
 
 #endif
+
+        #endregion
     }
 }
