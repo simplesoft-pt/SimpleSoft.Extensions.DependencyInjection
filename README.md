@@ -71,7 +71,8 @@ This library is compatible with the folowing frameworks:
     public interface IFacebookProvider : IProvider { }
 
     public interface IGoogleProvider : IProvider { }
-
+    
+    //	will be added as a transient service for IGoogleProvider and IProvider
     [Service(ServiceLifetime.Transient)]
     public class GoogleProvider : Provider, IGoogleProvider
     {
@@ -80,7 +81,8 @@ This library is compatible with the folowing frameworks:
 
         }
     }
-
+    
+    //	Will be added as a singleton service for IFacebookProvider and FacebookProvider
     [Service(TypesToRegister = new[] {typeof(FacebookProvider), typeof(IFacebookProvider)})]
     public class FacebookProvider : Provider, IFacebookProvider
     {
@@ -89,7 +91,8 @@ This library is compatible with the folowing frameworks:
 
         }
     }
-
+    
+    //	Will also be loaded
     public class ServiceConfigurator : IServiceConfigurator
     {
         public void Configure(IServiceCollection services)
