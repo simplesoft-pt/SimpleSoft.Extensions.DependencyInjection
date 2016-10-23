@@ -23,86 +23,89 @@ This library is compatible with the folowing frameworks:
 
 ## Tipical usage
 ```csharp
-    using System;
-    using Microsoft.Extensions.DependencyInjection;
-    using SimpleSoft.DependencyInjection;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using SimpleSoft.DependencyInjection;
 
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var provider =
-                new ServiceCollection()
-                    .AddServicesFrom<Program>()
-                    .BuildServiceProvider();
+public class Program
+{
+	public static void Main(string[] args)
+	{
+		var provider =
+			new ServiceCollection()
+				.AddServicesFrom<Program>()
+				.BuildServiceProvider();
 
-            foreach (var service in provider.GetServices<IProvider>())
-            {
-                Console.WriteLine(service);
-            }
+		using (var scope = provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+		{
+			var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+			Console.WriteLine(users);
 
-            Console.WriteLine(provider.GetRequiredService<IFacebookProvider>());
-            Console.WriteLine(provider.GetRequiredService<IGoogleProvider>());
-        }
-    }
+			var roles = scope.ServiceProvider.GetRequiredService<IRoleRepository>();
+			Console.WriteLine(roles);
+		}
+	}
+}
 
-    public interface IProvider { }
+public interface IRepository { }
 
-    public abstract class Provider : IProvider
-    {
-        private readonly ProviderSettings _settings;
+public interface IUserRepository : IRepository { }
 
-        protected Provider(ProviderSettings settings)
-        {
-            _settings = settings;
-        }
+public interface IRoleRepository : IRepository { }
 
-		public override string ToString()
-        {
-            return $"{{ Id : '{_settings.Id:D}' }}";
-        }
-    }
+public abstract class Repository : IRepository
+{
+	protected RepositoryOptions Options { get; }
 
-    public class ProviderSettings
-    {
-        public Guid Id { get; set; } = Guid.NewGuid();
-    }
+	protected Repository(RepositoryOptions options)
+	{
+		Options = options;
+	}
+}
 
-    public interface IFacebookProvider : IProvider { }
+[Service(ServiceLifetime.Scoped, TypesToRegister = new[] {typeof(IUserRepository)})]
+public class UserRepository : Repository, IUserRepository
+{
+	public UserRepository(RepositoryOptions options) : base(options)
+	{
 
-    public interface IGoogleProvider : IProvider { }
-    
-    //	will be added as a transient service for IGoogleProvider and IProvider
-    [Service(ServiceLifetime.Transient)]
-    public class GoogleProvider : Provider, IGoogleProvider
-    {
-        public GoogleProvider(ProviderSettings settings) : base(settings)
-        {
+	}
 
-        }
-    }
-    
-    //	Will be added as a singleton service for IFacebookProvider and FacebookProvider
-    [Service(TypesToRegister = new[] {typeof(FacebookProvider), typeof(IFacebookProvider)})]
-    public class FacebookProvider : Provider, IFacebookProvider
-    {
-        public FacebookProvider(ProviderSettings settings) : base(settings)
-        {
+	public override string ToString()
+	{
+		return string.Concat("Repository -> ", nameof(UserRepository));
+	}
+}
 
-        }
-    }
-    
-    //	Will also be loaded
-    public class ServiceConfigurator : IServiceConfigurator
-    {
-        public void Configure(IServiceCollection services)
-        {
-            services.AddTransient(k => new ProviderSettings
-            {
-                Id = Guid.NewGuid()
-            });
-        }
-    }
+[Service(ServiceLifetime.Scoped, TypesToRegister = new[] { typeof(IRoleRepository) })]
+public class RoleRepository : Repository, IRoleRepository
+{
+	public RoleRepository(RepositoryOptions options) : base(options)
+	{
+
+	}
+
+	public override string ToString()
+	{
+		return string.Concat("Repository -> ", nameof(RoleRepository));
+	}
+}
+
+public class RepositoryOptions
+{
+	public string ConnectionString { get; set; }
+}
+
+public class ServiceConfigurator : IServiceConfigurator
+{
+	public void Configure(IServiceCollection services)
+	{
+		services.AddSingleton(k => new RepositoryOptions
+		{
+			ConnectionString = "<some connection string>"
+		});
+	}
+}
 ```
 
 
