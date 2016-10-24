@@ -11,7 +11,7 @@ Some of the reasons to use this little library:
 This library can be installed via [NuGet](https://www.nuget.org/packages/SimpleSoft.DependencyInjection/) package. Just run the following command:
 
 ```powershell
-Install-Package SimpleSoft.DependencyInjection -Pre
+Install-Package SimpleSoft.DependencyInjection
 ```
 
 ## Compatibility
