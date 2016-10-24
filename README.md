@@ -67,15 +67,28 @@ public interface IRoleRepository : IRepository { }
 [Service(TryAdd = true, TypesToRegister = new[] {typeof(ILogger)})]
 public class Logger : ILogger, IDisposable
 {
+	private readonly LoggerOptions _options;
+
+	public Logger(LoggerOptions options)
+	{
+		_options = options;
+	}
+
 	public void Log(string message)
 	{
-		Console.WriteLine(message);
+		if (_options.Enabled)
+			Console.WriteLine(message);
 	}
 
 	public void Dispose()
 	{
 		//  do nothing
 	}
+}
+
+public class LoggerOptions
+{
+	public bool Enabled { get; set; }
 }
 
 public abstract class Repository : IRepository
@@ -127,6 +140,18 @@ public class ServiceConfigurator : IServiceConfigurator
 		services.AddSingleton(k => new RepositoryOptions
 		{
 			ConnectionString = "some connection string"
+		});
+	}
+}
+
+//  Class will also be scaned Configure will be invoked
+public class LoggerConfigurator : IServiceConfigurator
+{
+	public void Configure(IServiceCollection services)
+	{
+		services.AddSingleton(k => new LoggerOptions
+		{
+			Enabled = true
 		});
 	}
 }
