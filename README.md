@@ -8,10 +8,10 @@ Some of the reasons to use this little library:
 2. Use `IServiceConfigurator` to aggregate related registrations;
 
 ## Installation 
-This library can be installed via [NuGet](https://www.nuget.org/packages/SimpleSoft.DependencyInjection/) package. Just run the following command:
+This library can be installed via [NuGet](https://www.nuget.org/packages/SimpleSoft.Extensions.DependencyInjection) package. Just run the following command:
 
 ```powershell
-Install-Package SimpleSoft.DependencyInjection
+Install-Package SimpleSoft.Extensions.DependencyInjection
 ```
 
 ## Compatibility
@@ -26,7 +26,7 @@ This library is compatible with the folowing frameworks:
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleSoft.DependencyInjection;
+using SimpleSoft.Extensions.DependencyInjection;
 
 public class Program
 {
@@ -64,12 +64,17 @@ public interface IRoleRepository : IRepository { }
 
 //  Equivalent code:
 //  services.TryAddSingleton<ILogger, Logger>();
-[Service(TryAdd = true)]
-public class Logger : ILogger
+[Service(TryAdd = true, TypesToRegister = new[] {typeof(ILogger)})]
+public class Logger : ILogger, IDisposable
 {
 	public void Log(string message)
 	{
 		Console.WriteLine(message);
+	}
+
+	public void Dispose()
+	{
+		//  do nothing
 	}
 }
 
