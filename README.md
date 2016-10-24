@@ -1,4 +1,4 @@
-# SimpleSoft - DependencyInjection
+# SimpleSoft - DependencyInjection Extensions
 Library that helps to register services into the `IServiceCollection`, Microsoft's dependency injection facade, by enabling the developer to scan assemblies for service attributes or configurators.
 
 ## Reasons
