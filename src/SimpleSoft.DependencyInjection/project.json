@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.0.0-rc01",
+  "version": "1.0.0",
   "title": "SimpleSoft DependencyInjection",
   "description": "Library with utility classes for Microsoft Dependency Injection.",
   "authors": [ "João Simões" ],
