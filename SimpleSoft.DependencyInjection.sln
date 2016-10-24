@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{373A3854
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{5A465550-E5E6-457E-A982-838CEB0F8827}"
 	ProjectSection(SolutionItems) = preProject
+		tools\SimpleSoft.DependencyInjection.Logo.pdn = tools\SimpleSoft.DependencyInjection.Logo.pdn
+		tools\SimpleSoft.DependencyInjection.Logo.png = tools\SimpleSoft.DependencyInjection.Logo.png
 		tools\SimpleSoft.DependencyInjection.PublicKey = tools\SimpleSoft.DependencyInjection.PublicKey
 		tools\SimpleSoft.DependencyInjection.snk = tools\SimpleSoft.DependencyInjection.snk
 	EndProjectSection
