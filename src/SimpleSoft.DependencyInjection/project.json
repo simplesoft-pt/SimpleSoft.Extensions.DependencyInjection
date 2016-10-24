@@ -9,7 +9,7 @@
     "tags": [ "ioc", "di", "inversionofcontrol", "dependencyinjection", "aspects" ],
     "projectUrl": "https://github.com/gravity00/SimpleSoft.DependencyInjection",
     "licenseUrl": "https://raw.githubusercontent.com/gravity00/SimpleSoft.DependencyInjection/master/LICENSE",
-    "iconUrl": "",
+    "iconUrl": "https://github.com/gravity00/SimpleSoft.DependencyInjection/raw/master/tools/SimpleSoft.DependencyInjection.Logo.png",
     "releaseNotes": "",
     "owners": [ "João Simões" ],
     "repository": {
